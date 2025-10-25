@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "vehiculos"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "collado rent car"
+	}
+}

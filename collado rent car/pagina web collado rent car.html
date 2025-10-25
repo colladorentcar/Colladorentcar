@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Collado Rent Car</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+  body { background-color: #000; color: #fff; overflow-x: hidden; }
+
+  /* Pantalla de carga */
+  #intro { position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+    background: #000; display: flex; align-items: center; justify-content: center; flex-direction: column;
+    z-index: 9999; animation: fadeOut 2s ease 3s forwards; }
+  #intro img { width: 200px; animation: zoomIn 2s ease; }
+  #intro h1 { color: #e60000; margin-top: 20px; letter-spacing: 2px; text-transform: uppercase; }
+  @keyframes zoomIn { from { transform: scale(0); } to { transform: scale(1); } }
+  @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+
+  /* Header */
+  header { width: 100%; background-color: rgba(0,0,0,0.9); display: flex; justify-content: space-between;
+    align-items: center; padding: 15px 60px; position: fixed; top: 0; z-index: 1000; border-bottom: 2px solid #e60000; }
+  header img { width: 120px; }
+  nav a { color: white; text-decoration: none; margin-left: 25px; font-weight: 500; transition: color 0.3s; }
+  nav a:hover { color: #e60000; }
+
+  /* Hero con video */
+  .hero { position: relative; height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; }
+  #hero-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; }
+  .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 0; }
+  .hero-content { position: relative; z-index: 1; padding: 0 20px; }
+  .hero h1 { font-size: 60px; color: #fff; margin-bottom: 10px; text-transform: uppercase; }
+  .hero p { font-size: 20px; color: #ccc; margin-bottom: 25px; }
+  .hero a { background-color: #e60000; color: #fff; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s; }
+  .hero a:hover { background-color: #ff3333; }
+
+  /* Sección Vehículos */
+  #vehiculos { padding: 100px 5%; text-align: center; }
+  #vehiculos h2 { color: #e60000; font-size: 32px; margin-bottom: 40px; text-transform: uppercase; }
+  .flota { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; justify-items: center; }
+  .vehiculo { display: flex; flex-direction: column; align-items: center; }
+  .vehiculo img { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
+  .vehiculo img:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+  .vehiculo p { margin-top: 8px; color: #fff; font-weight: 500; font-size: 14px; }
+
+  /* Lightbox con flechas */
+  #lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 10000; flex-direction: column; }
+  #lightbox img { max-width: 90%; max-height: 80%; border-radius: 10px; margin-bottom: 20px; }
+  #lightbox button { padding: 10px 20px; background-color: #e60000; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+  #lightbox button:hover { background-color: #ff3333; }
+  .flecha { position: absolute; top: 50%; font-size: 40px; color: #fff; cursor: pointer; user-select: none; padding: 10px; border-radius: 5px; background: rgba(0,0,0,0.3); }
+  .flecha.izquierda { left: 20px; transform: translateY(-50%); }
+  .flecha.derecha { right: 20px; transform: translateY(-50%); }
+
+  /* Sección Servicios */
+  #servicios { padding: 100px 5%; text-align: center; }
+  #servicios h2 { color: #e60000; font-size: 32px; margin-bottom: 20px; text-transform: uppercase; }
+
+  /* Sección Contacto */
+  .contacto { padding: 100px 5%; text-align: center; }
+  .contacto a { display: inline-block; margin: 15px; background-color: #e60000; padding: 15px 25px; border-radius: 8px; color: #fff; text-decoration: none; transition: 0.3s; }
+  .contacto a:hover { background-color: #ff3333; }
+
+  /* Sección Mapa */
+  .mapa { text-align: center; padding: 60px 5%; }
+  .mapa h2 { color: #e60000; font-size: 32px; margin-bottom: 20px; text-transform: uppercase; }
+  .mapa iframe { width: 100%; height: 400px; border: none; border-radius: 10px; }
+
+  footer { background-color: #111; text-align: center; padding: 30px; border-top: 2px solid #e60000; }
+  footer p { color: #aaa; }
+
+  /* Ajustes responsivos */
+  @media screen and (max-width: 900px) {
+    .hero h1 { font-size: 45px; }
+    .hero p { font-size: 18px; }
+    .vehiculo img { height: 160px; }
+  }
+  @media screen and (max-width: 600px) {
+    header { flex-direction: column; padding: 10px; }
+    header img { width: 80px; margin-bottom: 5px; }
+    nav a { margin: 5px; font-size: 14px; }
+    .hero h1 { font-size: 24px; }
+    .hero p { font-size: 14px; }
+    .hero a { padding: 10px 20px; font-size: 14px; }
+    .vehiculo img { height: 120px; }
+    .vehiculo p { font-size: 12px; }
+
+    /* Hero móvil más bajado */
+    .hero { 
+      height: auto; 
+      background: url('imagenes/fondo.jpg') center center no-repeat; 
+      background-size: contain; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: flex-start; 
+      text-align: center; 
+      padding: 400px 10px 50px 10px; /* bajado más para que quede centrado */
+      position: relative;
+    }
+    .hero-content { 
+      transform: translateY(0); 
+    }
+    #hero-video { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="intro">
+  <img src="logo-collado.png" alt="Collado Rent Car Logo">
+  <h1>Bienvenido a Collado Rent Car</h1>
+</div>
+
+<header>
+  <img src="logo-collado.png" alt="Collado Rent Car Logo">
+  <nav>
+    <a href="#inicio">Inicio</a>
+    <a href="#vehiculos">Vehículos</a>
+    <a href="#servicios">Servicios</a>
+    <a href="#contacto">Contacto</a>
+    <a href="#ubicacion">Ubicación</a>
+  </nav>
+</header>
+
+<!-- Hero -->
+<section class="hero" id="inicio">
+  <video autoplay muted loop id="hero-video" preload="none">
+    <source src="videos/fondo.mp4" type="video/mp4">
+    Tu navegador no soporta videos.
+  </video>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1>Collado Rent Car</h1>
+    <p>Tu mejor opción para moverte con estilo y seguridad.</p>
+    <a href="#vehiculos">Ver Vehículos</a>
+  </div>
+</section>
+
+<!-- Sección Vehículos -->
+<section id="vehiculos">
+  <h2>Nuestros Vehículos</h2>
+  <div class="flota">
+    <div class="vehiculo"><img src="vehiculos/auto1.jpg" alt="Auto 1"><p>Toyota Highlander 2023</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto2.jpg" alt="Auto 2"><p>Mercedes-Benz GLE Coupe 2019</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto3.jpg" alt="Auto 3"><p>Toyota Highlander 2023</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto4.jpg" alt="Auto 4"><p>Chevrolet Tahoe 2020</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto5.jpg" alt="Auto 5"><p>Chevrolet Tahoe 2020</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto6.jpg" alt="Auto 6"><p>Toyota Land Cruiser Prado</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto7.jpg" alt="Auto 7"><p>Honda CR-V 2022</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto8.jpg" alt="Auto 8"><p>Toyota Land Cruiser Prado</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto9.jpg" alt="Auto 9"><p>Toyota Land Cruiser Prado</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto10.jpg" alt="Auto 10"><p>Toyota 4Runner Limited</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto11.jpg" alt="Auto 11"><p>Toyota 4Runner Limited</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto12.jpg" alt="Auto 12"><p>Toyota 4Runner Limited</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto13.jpg" alt="Auto 13"><p>Toyota Highlander 2016</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto14.jpg" alt="Auto 14"><p>Honda CR-V 2022</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto15.jpg" alt="Auto 15"><p>Toyota 4Runner</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto16.jpg" alt="Auto 16"><p>Honda CR-V 2022</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto17.jpg" alt="Auto 17"><p>Toyota Highlander 2016</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto18.jpg" alt="Auto 18"><p>Honda CR-V 2016</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto19.jpg" alt="Auto 19"><p>Honda CR-V 2016</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto20.jpg" alt="Auto 20"><p>Honda CR-V 2020</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto21.jpg" alt="Auto 21"><p>Honda CR-V 2016</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto22.jpg" alt="Auto 22"><p>Toyota Highlander 2023</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto23.jpg" alt="Auto 23"><p>Toyota Highlander 2024</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto24.jpg" alt="Auto 24"><p>Jeep Grand Cherokee 2021</p></div>
+    <div class="vehiculo"><img src="vehiculos/auto25.jpg" alt="Auto 25"><p>Can-Am Maverick X3 (UTV)</p></div>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div id="lightbox">
+  <span class="flecha izquierda" onclick="prevImg()">&#10094;</span>
+  <img id="lightbox-img" src="">
+  <span class="flecha derecha" onclick="nextImg()">&#10095;</span>
+  <button onclick="cerrarLightbox()">Cerrar</button>
+</div>
+
+<!-- Sección Servicios -->
+<section id="servicios">
+  <h2>Servicios</h2>
+  <p>Ofrecemos alquiler diario, 24/7 con las mejores tarifas del mercado.</p>
+</section>
+
+<!-- Sección Contacto -->
+<section id="contacto" class="contacto">
+  <h2>Contacto</h2>
+  <a href="https://wa.me/18293224115?text=Hola,%20quiero%20alquilar%20una%20jeepeta%20ahora%20mismo%20en%20Collado%20Rent%20Car%20🚗💨" target="_blank">WhatsApp</a>
+  <a href="https://mail.google.com/mail/?view=cm&to=joancollado1022@gmail.com&su=Alquiler%20de%20Vehículo&body=Hola,%20quiero%20información%20sobre%20los%20vehículos%20disponibles" target="_blank">Correo</a>
+</section>
+
+<!-- Sección Mapa -->
+<section id="ubicacion" class="mapa">
+  <h2>Ubicación</h2>
+  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5090.034866517289!2d-70.71092644379705!3d19.43776624097864!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8eb1cf3f6deff2af%3A0xafc15b658d515808!2sD%E2%80%99nosotros%20rent%20car%20%26%20casa%20de%20cambio!5e1!3m2!1ses-419!2sdo!4v1761350311160!5m2!1ses-419!2sdo" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</section>
+
+<footer>
+  <p>&copy; 2025 Collado Rent Car. Todos los derechos reservados.</p>
+</footer>
+
+<script>
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+const vehiculos = document.querySelectorAll('.vehiculo img');
+let currentIndex = 0;
+
+vehiculos.forEach((img, index) => {
+  img.addEventListener('click', () => {
+    currentIndex = index;
+    lightbox.style.display = 'flex';
+    lightboxImg.src = img.src;
+  });
+});
+
+function cerrarLightbox() {
+  lightbox.style.display = 'none';
+  lightboxImg.src = '';
+}
+
+function prevImg() {
+  currentIndex = (currentIndex - 1 + vehiculos.length) % vehiculos.length;
+  lightboxImg.src = vehiculos[currentIndex].src;
+}
+
+function nextImg() {
+  currentIndex = (currentIndex + 1) % vehiculos.length;
+  lightboxImg.src = vehiculos[currentIndex].src;
+}
+</script>
+
+</body>
+</html>
